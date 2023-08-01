@@ -5,6 +5,7 @@ class App extends Component {
     state = {
         players: [],
         modalVisibility: false,
+        currentData: "",
     };
     
     componentDidMount() {
@@ -63,8 +64,67 @@ class App extends Component {
         })
     }
 
+    changeCurrentData = (type, isInc) => {
+        const newCurrentData = this.state.currentData ? this.state.currentData : {
+                fname: "none",
+                age: 0,
+                position: 'none',
+                value: 0,
+        }
+
+
+        if(type === "age"){
+            if(isInc){
+                newCurrentData.age++;
+            }
+
+            else if(newCurrentData.age < 1){
+                newCurrentData.age = 0;
+            }
+            
+            else{
+                newCurrentData.age--;
+            }
+
+        }
+
+        if(type === "value"){
+            if(isInc){
+                newCurrentData.value++;
+            }
+
+            else if(newCurrentData.value < 1){
+                newCurrentData.value = 0;
+            }
+            else{
+                newCurrentData.value--;
+            }
+
+        }
+
+        this.setState({
+            currentData: newCurrentData,
+        })
+    };
+   
+    saveChanges = () => {
+        const {players, currentData} = this.state;
+        players.push(currentData);
+        this.setState({
+            players,
+            modalVisibility: false,
+        });
+    };
+
+
+    clearCurrentData = () => {
+        this.setState({
+            currentData: "",
+        })
+    }
+
     render() {
-        const {players, modalVisibility} = this.state;
+        const { players, modalVisibility, currentData } = this.state;
         
         return (
             <div className='container'>
@@ -75,22 +135,30 @@ class App extends Component {
                             <button className='btn btn-primary m-3' onClick={this.openModal}>Add a player</button>
                         </div>
                         {
-                            modalVisibility ? <PlayerModal closeModal={this.closeModal}/> : ""
+                            modalVisibility ? <PlayerModal 
+                                                closeModal={this.closeModal} 
+                                                currentData={currentData} 
+                                                changeCurrentData={this.changeCurrentData} 
+                                                saveChanges={this.saveChanges} 
+                                                clearCurrentData={this.clearCurrentData}
+                                                 /> : ""
                         }
                     </div>
                     <div className="col-10">
                         <table className='table table-light table-hover m-5 text-left table-sm'>
                             <thead className='thead'>
-                                <th>№</th>
-                                <th>Name</th>
-                                <th>Age</th>
-                                <th>Position</th>
-                                <th>Value</th>
-                                <th></th>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Position</th>
+                                    <th>Value</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tbody>
                                 {players.map((item, index) => (
-                                    <tr>
+                                    <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{item.fname}</td>
                                         <td>{item.age}</td>
